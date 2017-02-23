@@ -2,6 +2,7 @@ package parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,12 +33,23 @@ public class ASTParser {
 	 */
 	public static String parseProject(String projectPath) {
 		ArrayList<File> files = FileSystemHelpers.getJavaFilesOfFolderRecursively(projectPath);
-		JSONObject javaproject = new JSONObject();
-		for (File file : files) {
-			String filename = file.getAbsolutePath();
-			javaproject.put(filename, parse(filename));
+		StringBuilder javaproject = new StringBuilder("{\n   "); 
+		String filename;
+		JSONObject fileAST;
+		StringWriter w = new StringWriter();
+		StringBuffer b = w.getBuffer();
+		for (int i = 0; i < files.size() - 1; i++) {
+			filename = files.get(i).getAbsolutePath();
+			fileAST = parse(filename);
+			fileAST.write(w, 3, 3);
+			javaproject.append("\"" + filename + "\": {\n" + b.substring(2) + ",\n   ");
+			b.setLength(0);
 		}
-		return javaproject.toString(3);
+		filename = files.get(files.size() - 1).getAbsolutePath();
+		fileAST = parse(filename);
+		fileAST.write(w, 3, 3);
+		javaproject.append("\"" + filename + "\": {\n" + b.substring(2) + "\n}");
+		return javaproject.toString();
 	}
 
 	/**
