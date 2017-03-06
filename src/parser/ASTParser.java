@@ -1,7 +1,9 @@
 package parser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,6 +94,7 @@ public class ASTParser {
 	 * @return a String containing the AST of the java file in JSON format.
 	 */
 	private static JSONObject parse(String filename, String sourceCode) {
+		System.setErr(new PrintStream(new ByteArrayOutputStream()));
 		JavaCompiler compiler = JavacTool.create();
 		StandardJavaFileManager manager = compiler.getStandardFileManager(null, null, null);
 		Iterable<? extends JavaFileObject> units = null;
