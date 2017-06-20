@@ -35,23 +35,27 @@ public class ASTParser {
 	 */
 	public static String parseProject(String projectPath) {
 		ArrayList<File> files = FileSystemHelpers.getJavaFilesOfFolderRecursively(projectPath);
-		StringBuilder javaproject = new StringBuilder("{\n   "); 
-		String filename;
-		JSONObject fileAST;
-		StringWriter w = new StringWriter();
-		StringBuffer b = w.getBuffer();
-		for (int i = 0; i < files.size() - 1; i++) {
-			filename = files.get(i).getAbsolutePath();
+		if (files.size() > 0){
+			StringBuilder javaproject = new StringBuilder("{\n   "); 
+			String filename;
+			JSONObject fileAST;
+			StringWriter w = new StringWriter();
+			StringBuffer b = w.getBuffer();
+			for (int i = 0; i < files.size() - 1; i++) {
+				filename = files.get(i).getAbsolutePath();
+				fileAST = parse(filename);
+				fileAST.write(w, 3, 3);
+				javaproject.append("\"" + filename + "\": {\n" + b.substring(2) + ",\n   ");
+				b.setLength(0);
+			}
+			filename = files.get(files.size() - 1).getAbsolutePath();
 			fileAST = parse(filename);
 			fileAST.write(w, 3, 3);
-			javaproject.append("\"" + filename + "\": {\n" + b.substring(2) + ",\n   ");
-			b.setLength(0);
+			javaproject.append("\"" + filename + "\": {\n" + b.substring(2) + "\n}");
+			return javaproject.toString();
 		}
-		filename = files.get(files.size() - 1).getAbsolutePath();
-		fileAST = parse(filename);
-		fileAST.write(w, 3, 3);
-		javaproject.append("\"" + filename + "\": {\n" + b.substring(2) + "\n}");
-		return javaproject.toString();
+		else
+			return "{}";
 	}
 
 	/**
